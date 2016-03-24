@@ -24,7 +24,3 @@
 .main_div {
 	
 }
-
-ul.pagination li a[!onClick] {
-	background-color: yellow;
-}

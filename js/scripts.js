@@ -76,17 +76,17 @@ function verifForm(form)
 
 function changePage(page){
 	
-	if(page < 1 || page > (dom_results.length-1)/3 + 1) return;
+	if(page < 1 || page > (dom_results.length-1)/nb_res_per_page + 1) return;
 	var pagination = $(".pagination");
 	// Déermine s'il faut ajuster les valeurs des pages :
 
 	updatePagination(page);
 
-	var result_offset =  (page-1)*3;
+	var result_offset =  (page-1)*nb_res_per_page;
 	res_div.empty();
 /*	console.log(result_offset);
 	console.log(dom_results.length);
-*/	for(i=0; i < 3 && (result_offset < dom_results.length); ++i){
+*/	for(i=0; i < nb_res_per_page && (result_offset < dom_results.length); ++i){
 		res_div.append(dom_results[result_offset]);
 		++result_offset;
 	}
@@ -99,28 +99,45 @@ function updatePagination(page){
   console.log(page);
 	//Données :
 	var pagination = $(".pagination");
-	nbPages = Math.floor((dom_results.length-1)/3) + 1;
+	nbPages = Math.floor((dom_results.length-1)/nb_res_per_page) + 1;
+
+	// Si le composant de pagination est vide, alors on l'initialise : 
 	if(pagination.children().length == 0)
 	{
 		initPagination();
 		console.log('initPagination');
 		return;
 	}
+	// Pas besoin de pagination s'il n'y a qu'une page
 	if(nbPages < 2) return;
+	if(nbPages <= 10){
+		if(page == 1)
+			$(".pagination li").first().children("a").removeAttr('onClick');
+		else 
+			$(".pagination li").first().children("a").attr('onClick', 'changePage('+(page-1)+')');
+		if (page==nbPages < 1)
+			$(".pagination li").last().children("a").removeAttr('onClick');
+		else 
+			$(".pagination li").last().children("a").attr('onClick', 'changePage('+(page+1)+')');
+		
+		$(".pagination li:nth-child("+(page-1)+")").addClass("active");
 
-	for(i=1; i <= $(".pagination li").length-2; ++i){
+		return;
+	}
+	// Recherche de l'élément cliqué
+	for(i=1; i <= $(".pagination li").length-2; ++i){ // Parcours des puces de la liste, après Prec, jusqu'à Suiv
 		if($(".pagination li")[i].textContent == page)
 			break;
 	}// i = page cliquée
 
-  var offset = i-6; // Offset de décalage avec le mileu (case 6)
+  	var offset = i-6; // Offset de décalage avec le mileu (case 6)
 	var page_old = parseInt(pagination.children()[1].textContent); // Première page de la liste
 	var new_page = 0;
 	// Si le dernier chiffre de la liste à faire est > nbPages, ou si le premier est < 1, 
 	// On ne décale pas les pages
 	new_page = page_old + offset;
 
-  if(page <= 6){
+  	if(page <= 6){
 		new_page=1;
 	} 
 	else if (page >= nbPages-4){
@@ -128,28 +145,38 @@ function updatePagination(page){
 	}
 
 	pagination.empty();
-	if(page==1){
+/*	if(page==1){
 		pagination.append('<li><a>Prec</a></li>');
 	}
 	else 
-		pagination.append('<li><a href="#result" onClick="changePage('+(page-1)+')">Prec</a></li>');
+*/		pagination.append('<li><a href="#result" onClick="changePage('+(page-1)+')">Prec</a></li>');
 	
     for(j=0; j<10 && (j < nbPages); j++){
       pagination.append('<li><a href="#result" onClick="changePage('+(j+new_page)+')">'+(j+new_page)+'</a></li>');
+      if(j+new_page == page) $(".pagination li:nth-child("+(j+2)+")").addClass("active");
     }
-
-	if(page==nbPages){
+    	;
+/*	if(page==nbPages){
 		pagination.append('<li><a>Suiv</a></li>');	
 	}
 	else 
-		pagination.append('<li><a href="#result" onClick="changePage('+(page+1)+')">Suiv</a></li>');			
+*/		pagination.append('<li><a href="#result" onClick="changePage('+(page+1)+')">Suiv</a></li>');
+
+	if(page==1)
+		$(".pagination li").first().addClass("disabled");
+	else 
+		$(".pagination li").first().removeClass("disabled");
+	if(page==nbPages)
+		$(".pagination li").last().addClass("disabled");
+	else 
+		$(".pagination li").last().removeClass("disabled");
 }
 
 
 function initPagination(){
 	var pagination = $(".pagination");
 	pagination.empty();
-	nbPages = Math.floor((dom_results.length-1)/3) + 1;
+	nbPages = Math.floor((dom_results.length-1)/nb_res_per_page) + 1;
 	pagination.append('<li><a>Prec</a></li>');	
 	for(i = 1; i <= nbPages && i <= 10; ++i){
 		pagination.append('<li><a href="#result" onClick="changePage('+i+')">'+i+'</a></li>');
@@ -158,11 +185,16 @@ function initPagination(){
 		pagination.append('<li><a href="#result" onClick="changePage(2)">Suiv</a></li>');
 	else 
 		pagination.append('<li><a>Suiv</a></li>');
+	$(".pagination li").first().addClass("disabled");
+	$(".pagination li:nth-child(2)").addClass("active");
 }
 // Main functions : 
 function init(){
-	res_div = $(".result");
-	dom_results = res_div.children();
+	res_div 		= 	$(".result");
+	dom_results 	= 	res_div.children();
+	// Définit des variables globales pour la pagination
+	nb_res_per_page	= 	3;
+	nb_max_pages	=	10;
 	changePage(1);
 }
 
