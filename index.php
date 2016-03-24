@@ -54,7 +54,7 @@
 
 					<?php
 						if(isset($_POST['submit'])){
-							$url_bad_picture = "/~sr03p027/common/img/unnamed.png";
+							$url_bad_picture = "resources/img/unnamed.png";
 
 							$url = 'https://webapplis.utc.fr/Trombi_ws/mytrombi/result?nom=xx&prenom=xx';
 							$ch = curl_init($url);
