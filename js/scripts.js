@@ -73,3 +73,97 @@ function verifForm(form)
 	return formOk;
 }
 
+
+function changePage(page){
+	
+	if(page < 1 || page > (dom_results.length-1)/3 + 1) return;
+	var pagination = $(".pagination");
+	// Déermine s'il faut ajuster les valeurs des pages :
+
+	updatePagination(page);
+
+	var result_offset =  (page-1)*3;
+	res_div.empty();
+/*	console.log(result_offset);
+	console.log(dom_results.length);
+*/	for(i=0; i < 3 && (result_offset < dom_results.length); ++i){
+		res_div.append(dom_results[result_offset]);
+		++result_offset;
+	}
+
+
+}
+
+function updatePagination(page){
+	var i;
+  console.log(page);
+	//Données :
+	var pagination = $(".pagination");
+	nbPages = Math.floor((dom_results.length-1)/3) + 1;
+	if(pagination.children().length == 0)
+	{
+		initPagination();
+		console.log('initPagination');
+		return;
+	}
+	if(nbPages < 2) return;
+
+	for(i=1; i <= $(".pagination li").length-2; ++i){
+		if($(".pagination li")[i].textContent == page)
+			break;
+	}// i = page cliquée
+
+  var offset = i-6; // Offset de décalage avec le mileu (case 6)
+	var page_old = parseInt(pagination.children()[1].textContent); // Première page de la liste
+	var new_page = 0;
+	// Si le dernier chiffre de la liste à faire est > nbPages, ou si le premier est < 1, 
+	// On ne décale pas les pages
+	new_page = page_old + offset;
+
+  if(page <= 6){
+		new_page=1;
+	} 
+	else if (page >= nbPages-4){
+		new_page	=	nbPages-9;
+	}
+
+	pagination.empty();
+	if(page==1){
+		pagination.append('<li><a>Prec</a></li>');
+	}
+	else 
+		pagination.append('<li><a href="#result" onClick="changePage('+(page-1)+')">Prec</a></li>');
+	
+    for(j=0; j<10 && (j < nbPages); j++){
+      pagination.append('<li><a href="#result" onClick="changePage('+(j+new_page)+')">'+(j+new_page)+'</a></li>');
+    }
+
+	if(page==nbPages){
+		pagination.append('<li><a>Suiv</a></li>');	
+	}
+	else 
+		pagination.append('<li><a href="#result" onClick="changePage('+(page+1)+')">Suiv</a></li>');			
+}
+
+
+function initPagination(){
+	var pagination = $(".pagination");
+	pagination.empty();
+	nbPages = Math.floor((dom_results.length-1)/3) + 1;
+	pagination.append('<li><a>Prec</a></li>');	
+	for(i = 1; i <= nbPages && i <= 10; ++i){
+		pagination.append('<li><a href="#result" onClick="changePage('+i+')">'+i+'</a></li>');
+	}
+	if(nbPages > 1)
+		pagination.append('<li><a href="#result" onClick="changePage(2)">Suiv</a></li>');
+	else 
+		pagination.append('<li><a>Suiv</a></li>');
+}
+// Main functions : 
+function init(){
+	res_div = $(".result");
+	dom_results = res_div.children();
+	changePage(1);
+}
+
+init();

@@ -1,1 +1,30 @@
-# Empty CSS file for your own CSS
+/*Empty CSS file for your own CSS*/
+
+.form-inline {
+	margin-bottom: 3%;
+	text-align: center;
+}
+
+.pagination-container {
+	text-align: center;
+}
+
+.thumbs {
+	text-align: center;
+}
+
+.result {
+	
+}
+
+.pagination {
+	text-align: center;
+}
+
+.main_div {
+	
+}
+
+ul.pagination li a[!onClick] {
+	background-color: yellow;
+}
